@@ -9,7 +9,7 @@ class CategoryController extends Controller
 {
     public function index(){
         $categories = Category::all();
-        return response()->json($categories);
+        return response()->json(['sucess'=>true,'data'=>$categories]);
     }
 
     public function show(Category $category){
@@ -26,6 +26,10 @@ class CategoryController extends Controller
     public function destroy(Category $category){
         $category->delete();
         return response()->json(["message"=> "Delete Successful"]);
+    }
+    public function showWithPosts(){
+        $categories = Category::with('posts')->get();
+        return response()->json($categories);
     }
 
 }
