@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PostResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
@@ -17,15 +18,16 @@ class PostController extends Controller
         ]);
     }
     public function store(StorePostRequest $request){
-        Post::Create($request->validated());
+        $validated= $request->validated();
+        $validated['author_id']=auth()->user()->id;
+        Post::Create($validated);
         return response()->json([
             'sucess'=>true,
-
-        ]);
+        ],201);
     }
 
     public function show(Post $post){
-       return response()->json($post);
+       return new PostResource($post);
     }
 
     public function update(Request $request,Post $post){
@@ -42,7 +44,7 @@ class PostController extends Controller
     }
     public function destroy(Post $post){
         $post->delete();
-        return response()->json(['success'=>true,]);
+        return response()->json(['success'=>true,],204);
     }
 
     

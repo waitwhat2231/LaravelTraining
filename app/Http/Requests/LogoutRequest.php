@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StorePostRequest extends FormRequest
+class LogoutRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,24 +21,8 @@ class StorePostRequest extends FormRequest
      */
     public function rules(): array
     {
-                /*
-        •	title (string)
-•	content (text)
-•	published_at (datetime, nullable)
-•	category_id (foreign key)
-•	author_id (foreign key)
-
-        */
         return [
-            'title'=>'required|string',
-            'content'=>'required|string',
-            'category_id'=>'required|exists:categories,id',
+            //
         ];
-    }
-     protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'author_id' => auth()->id(),
-        ]);
     }
 }
