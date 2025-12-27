@@ -7,6 +7,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PostResource extends JsonResource
 {
+     protected bool $getCategory = false;
+     protected bool $getAuthor = false;
+      public function __construct($resource, bool $getCategory = false,bool $getAuthor = false)
+    {
+        parent::__construct($resource);
+        $this->getCategory = $getCategory;
+        $this->getAuthor = $getAuthor;
+    }
     /**
      * Transform the resource into an array.
      *
@@ -20,14 +28,14 @@ class PostResource extends JsonResource
             'content'     => $this->content,
             'category_id' => $this->category_id,
             'author_id'   => $this->author_id,
-            'author'      => [
+            'author'      =>$this->getAuthor? [
                 'id'   => $this->author->id ?? null,
                 'name' => $this->author->name ?? null,
-            ],
-            'category'=>[
+            ]:null,
+            'category'=>$this->getCategory?[
                 'id'=>$this->category_id??null,
                 'name'=>$this->category->name ?? null,
-            ]
+            ]:null
         ];
     }
 }

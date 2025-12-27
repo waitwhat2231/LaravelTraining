@@ -2,48 +2,51 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
+use App\Services\Posts\PostServiceInterface;
 
 class PostController extends Controller
 {
+       public function __construct(
+        private PostServiceInterface $postService
+    ) {}
     public function index()
     {
-        $posts = Post::all();
+        $posts = $this->postService->getAll();
         return response()->json([
             'success'=>true,
-            'data'=>$posts
-        ]);
+            'data'=>new Collection(PostResource::collection($posts)),
+        ],200);
     }
     public function store(StorePostRequest $request){
         $validated= $request->validated();
         $validated['author_id']=auth()->user()->id;
-        Post::Create($validated);
+        $post = $this->postService->createPost($validated);
         return response()->json([
             'sucess'=>true,
+            'data'=>new PostResource($post),
         ],201);
     }
 
     public function show(Post $post){
-       return new PostResource($post);
+       return new PostResource($post,true,true);
     }
 
-    public function update(Request $request,Post $post){
-           $validated = $request->validate([
-        'title'       => 'sometimes|required|string',
-        'content'     => 'sometimes|required|string',
-        'category_id' => 'sometimes|required|exists:categories,id',
-    ]);
-    $post->update($validated);
+    public function update(UpdatePostRequest $request,Post $post){
+    $validated = $request->validated();
+    $updated_post=$this->postService->updatePost($post,$validated);
     return response()->json([
         'success'=>true,
-        'data'=>$post
-    ]);
+        'data'=>new PostResource($updated_post)
+    ],204);
     }
     public function destroy(Post $post){
-        $post->delete();
+        $this->postService->deletePost($post);
         return response()->json(['success'=>true,],204);
     }
 
